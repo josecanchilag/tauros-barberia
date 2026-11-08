@@ -1,0 +1,624 @@
+/* =============================================================================
+   animations.css — Animaciones y personalización (sin librerías).
+   Reglas: solo transform y opacity (más el "poste de barbero", que anima
+   background-position por diseño, y el trazo del check con stroke-dashoffset).
+   Duraciones de 150ms a 600ms, salvo las ambientales (pulso del botón,
+   parpadeo del punto, zoom del hero, shimmer y poste).
+   Usa las variables --dur-fast, --dur-base, --ease y --bounce de styles.css.
+   Respeta prefers-reduced-motion al final del archivo.
+   ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+   1. HERO — entrada escalonada del contenido, zoom lento de la imagen y
+      línea dorada que crece.
+   --------------------------------------------------------------------------- */
+.hero-content > * {
+  opacity: 0;
+  animation: fade-up var(--dur-base) var(--ease) forwards;
+}
+.hero-content > .eyebrow {
+  animation-delay: 60ms;
+}
+.hero-content > h1 {
+  animation-delay: 160ms;
+}
+.hero-content > p {
+  animation-delay: 260ms;
+}
+.hero-content > .btn {
+  animation-delay: 360ms;
+}
+.hero-content > .hero-detail {
+  animation-delay: 460ms;
+}
+.hero-image {
+  animation: zoom-lento 1400ms var(--ease) both;
+}
+.hero-detail > span {
+  animation: crecer-linea 600ms var(--ease) 700ms both;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes zoom-lento {
+  from {
+    transform: scale(1.08);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+@keyframes crecer-linea {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   2. LOGO — al pasar el mouse, la tijera hace un pequeño "snip" (±12°).
+      (El giro del rombo se define con transition en styles.css.)
+   --------------------------------------------------------------------------- */
+@keyframes snip {
+  0% {
+    transform: rotate(0deg);
+  }
+  30% {
+    transform: rotate(-12deg);
+  }
+  65% {
+    transform: rotate(12deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+.logo:hover .logo-snip svg {
+  animation: snip 420ms var(--bounce);
+}
+
+/* ---------------------------------------------------------------------------
+   3. BOTONES — brillo diagonal al hover, pulsación suave del hero cada 6 s.
+   --------------------------------------------------------------------------- */
+.btn-gold::after {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  background: linear-gradient(
+    115deg,
+    transparent 32%,
+    rgba(255, 255, 255, 0.55) 50%,
+    transparent 68%
+  );
+  transform: translateX(-130%);
+  pointer-events: none;
+}
+.btn-gold:hover::after {
+  animation: brillo var(--dur-base) var(--ease);
+}
+@keyframes brillo {
+  from {
+    transform: translateX(-130%);
+  }
+  to {
+    transform: translateX(130%);
+  }
+}
+/* Ambiental: pulso cada 6 segundos */
+.hero .btn-gold {
+  animation: pulso-suave 6s ease-in-out infinite;
+}
+@keyframes pulso-suave {
+  0%,
+  88%,
+  100% {
+    transform: scale(1);
+  }
+  93% {
+    transform: scale(1.035);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   4. CARDS DE SILLAS — entrada en cascada con IntersectionObserver (90 ms
+      por card, la demora se pasa con la variable --i), pulso al seleccionar
+      y parpadeo del punto de estado.
+   --------------------------------------------------------------------------- */
+.chair-card {
+  opacity: 0;
+}
+.chair-card.in-view {
+  opacity: 1;
+  animation: fade-up var(--dur-base) var(--ease) backwards;
+  animation-delay: calc(var(--i, 0) * 90ms);
+}
+.chair-card.seleccionada {
+  animation: pulso-card 480ms var(--bounce);
+}
+@keyframes pulso-card {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+/* Ambiental: el punto verde late suavemente */
+.status.available i {
+  animation: parpadeo 2.4s ease-in-out infinite;
+}
+@keyframes parpadeo {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.8);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   5. MODALES — backdrop con fade, panel con scale + translateY; en móvil el
+      bottom-sheet sube desde abajo; al cerrar, animación inversa.
+   --------------------------------------------------------------------------- */
+.modal-backdrop.abriendo {
+  animation: fade-in var(--dur-base) var(--ease);
+}
+.modal-backdrop.abriendo .booking-modal,
+.modal-backdrop.abriendo .small-modal {
+  animation: modal-entra var(--dur-base) var(--bounce);
+}
+.modal-backdrop.cerrando {
+  animation: fade-out var(--dur-fast) var(--ease) forwards;
+}
+.modal-backdrop.cerrando .booking-modal,
+.modal-backdrop.cerrando .small-modal {
+  animation: modal-sale var(--dur-fast) var(--ease) forwards;
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes modal-entra {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes modal-sale {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+  }
+}
+@media (max-width: 800px) {
+  .modal-backdrop.abriendo .booking-modal,
+  .modal-backdrop.abriendo .small-modal {
+    animation-name: sheet-entra;
+  }
+  .modal-backdrop.cerrando .booking-modal,
+  .modal-backdrop.cerrando .small-modal {
+    animation-name: sheet-sale;
+  }
+  @keyframes sheet-entra {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: none;
+    }
+  }
+  @keyframes sheet-sale {
+    from {
+      transform: none;
+    }
+    to {
+      transform: translateY(100%);
+    }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   6. PASOS DEL MODAL — el contenido entra deslizándose hacia el sentido de
+      la navegación; la barra de progreso se llena y el círculo activo hace
+      un "pop".
+   --------------------------------------------------------------------------- */
+.step-content {
+  animation: paso-siguiente var(--dur-base) var(--ease) backwards;
+}
+.step-content.atras {
+  animation-name: paso-anterior;
+}
+@keyframes paso-siguiente {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes paso-anterior {
+  from {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.progress .active span {
+  animation: pop var(--dur-base) var(--bounce);
+}
+.progress > div.done:after {
+  animation: llenar var(--dur-base) var(--ease) backwards;
+  transform-origin: left center;
+}
+@keyframes pop {
+  0% {
+    transform: scale(0.7);
+  }
+  60% {
+    transform: scale(1.14);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes llenar {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   7. CALENDARIO Y SLOTS — cascada rápida (18 ms y 20 ms por elemento),
+      el seleccionado rebota y los ocupados no reaccionan.
+   --------------------------------------------------------------------------- */
+.calendar button:not(.day-name):not(.mes-nav button) {
+  animation: dia-entra var(--dur-fast) var(--ease) backwards;
+  animation-delay: calc(var(--i, 0) * 18ms);
+}
+.calendar button.selected {
+  animation: rebote var(--dur-base) var(--bounce);
+}
+@keyframes dia-entra {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes rebote {
+  0% {
+    transform: scale(0.85);
+  }
+  60% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.slots button:not(.occupied) {
+  animation: slot-entra var(--dur-fast) var(--ease) backwards;
+  animation-delay: calc(var(--i, 0) * 20ms);
+}
+.slots button.selected {
+  animation: rebote var(--dur-base) var(--bounce);
+}
+@keyframes slot-entra {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   8. TIEMPO REAL — destello dorado breve cuando un dato cambia por Realtime.
+   --------------------------------------------------------------------------- */
+@keyframes destello {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  40% {
+    opacity: 0.35;
+  }
+}
+.flash {
+  animation: destello 600ms var(--ease);
+}
+.chair-card.flash,
+.slots button.flash {
+  position: relative;
+}
+.chair-card.flash::after,
+.slots button.flash::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(200, 150, 42, 0.3);
+  border-radius: inherit;
+  pointer-events: none;
+  animation: fade-out 600ms var(--ease) forwards;
+}
+tr.flash td {
+  background: rgba(200, 150, 42, 0.14);
+  transition: background var(--dur-base) var(--ease);
+}
+
+/* ---------------------------------------------------------------------------
+   9. ERRORES — banner con slide-down y temblor, inputs y tarjeta de login.
+   --------------------------------------------------------------------------- */
+.error-banner {
+  animation: error-entra var(--dur-base) var(--ease), temblor 320ms var(--ease) 300ms;
+}
+@keyframes error-entra {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes temblor {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-7px);
+  }
+  40% {
+    transform: translateX(6px);
+  }
+  60% {
+    transform: translateX(-4px);
+  }
+  80% {
+    transform: translateX(3px);
+  }
+}
+.input-error {
+  animation: temblor 320ms var(--ease);
+}
+.field-error {
+  animation: fade-up var(--dur-fast) var(--ease) backwards;
+}
+.login-card.error {
+  animation: temblor 400ms var(--ease);
+}
+
+/* ---------------------------------------------------------------------------
+   10. CONFIRMACIÓN — check con pop y anillo expansivo, trazo dibujado,
+       recibo con fade-up y filas en cascada.
+   --------------------------------------------------------------------------- */
+.success-mark {
+  animation: pop 500ms var(--bounce) both;
+}
+.success-mark::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--green);
+  animation: anillo 900ms var(--ease) 200ms forwards;
+}
+@keyframes anillo {
+  from {
+    transform: scale(1);
+    opacity: 0.75;
+  }
+  to {
+    transform: scale(2.3);
+    opacity: 0;
+  }
+}
+.success-mark svg path {
+  stroke-dasharray: 34;
+  stroke-dashoffset: 34;
+  animation: dibujar 600ms var(--ease) 320ms forwards;
+}
+@keyframes dibujar {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.confirmation-wrap > .eyebrow,
+.confirmation-wrap > h1,
+.confirmation-wrap > p {
+  animation: fade-up var(--dur-base) var(--ease) both;
+}
+.confirmation-wrap > h1 {
+  animation-delay: 120ms;
+}
+.confirmation-wrap > p {
+  animation-delay: 200ms;
+}
+.receipt {
+  animation: fade-up var(--dur-base) var(--ease) 260ms both;
+}
+.receipt > div {
+  animation: fade-up var(--dur-base) var(--ease) backwards;
+  animation-delay: calc(320ms + var(--i, 0) * 90ms);
+}
+
+/* ---------------------------------------------------------------------------
+   11. ADMIN — cada pestaña entra con fade-up, las filas de tabla en cascada
+       (40 ms) y el aviso flotante sube desde abajo.
+   --------------------------------------------------------------------------- */
+.admin-section {
+  animation: fade-up var(--dur-base) var(--ease) both;
+}
+.tabla-cascada tbody tr {
+  animation: fila-entra var(--dur-base) var(--ease) backwards;
+  animation-delay: calc(var(--i, 0) * 40ms);
+}
+@keyframes fila-entra {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.aviso {
+  animation: aviso-entra var(--dur-base) var(--bounce);
+}
+.aviso.saliendo {
+  animation: aviso-sale var(--dur-fast) var(--ease) forwards;
+}
+@keyframes aviso-entra {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 16px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+@keyframes aviso-sale {
+  from {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, 16px);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   12. ESTADOS DE CARGA — skeletons con shimmer (el brillo viaja con
+       transform) y el loader "poste de barbero" (franjas animadas con
+       background-position, permitido por diseño).
+   --------------------------------------------------------------------------- */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: #ebebe9;
+  border-radius: 8px;
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.8) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: shimmer 1.2s ease-in-out infinite;
+}
+@keyframes shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+.skeleton-card {
+  border-radius: 14px;
+  height: 380px;
+}
+.skeleton-slot {
+  height: 42px;
+  border-radius: 8px;
+}
+.skeleton-fila {
+  height: 52px;
+  margin: 0 16px;
+  border-radius: 6px;
+}
+/* Poste de barbero: barras diagonales en dorado, blanco y tinta */
+.pole {
+  animation: barber-pole 900ms linear infinite;
+}
+@keyframes barber-pole {
+  to {
+    background-position: 30px 0;
+  }
+}
+.pole-contenedor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 34px 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+/* ---------------------------------------------------------------------------
+   13. PREFERENCIA DE MOVIMIENTO REDUCIDO — desactiva todo.
+   --------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .chair-card,
+  .hero-content > * {
+    opacity: 1 !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}

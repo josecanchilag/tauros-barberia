@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Panel admin – Tauros Barbería</title>
+  <meta name="description" content="Panel de administración de Tauros Barbería: barberos, horarios y citas.">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#17172a">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/admin.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <script>
+    /* Decide qué vista mostrar antes de pintar (evita el parpadeo del login) */
+    try {
+      document.documentElement.dataset.sesion =
+        sessionStorage.getItem("tauros_admin_sesion") === "1" ? "si" : "no";
+    } catch (e) {
+      document.documentElement.dataset.sesion = "no";
+    }
+  </script>
+</head>
+<body>
+
+  <!-- ====================================================================
+       VISTA: LOGIN (RF-07) — dos paneles
+       ==================================================================== -->
+  <div id="vista-login" class="login-page">
+    <div class="login-brand">
+      <div class="logo logo-light">
+        <span class="logo-mark">
+          <span class="logo-snip">
+            <svg aria-hidden="true" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="7" r="3"></circle><circle cx="6" cy="17" r="3"></circle><path d="m8.7 8.3 12.3 6.2M8.7 15.7 21 9.5"></path></svg>
+          </span>
+        </span>
+        <span>
+          <b>TAUROS</b>
+          <small>BARBERÍA</small>
+        </span>
+      </div>
+      <div>
+        <span>GESTIÓN SIMPLE</span>
+        <h1>Todo bajo<br>control.</h1>
+        <p>Organiza tu equipo, define horarios y gestiona cada cita desde un solo lugar.</p>
+      </div>
+      <small>TAUROS BARBERÍA · ADMINISTRACIÓN</small>
+    </div>
+
+    <div class="login-side">
+      <a class="back-link" href="../">← Volver al sitio</a>
+      <form class="login-card" id="form-login" novalidate>
+        <span class="lock-icon">
+          <svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+        </span>
+        <h2>Bienvenido</h2>
+        <p>Ingresa tu contraseña para acceder al panel.</p>
+        <label>
+          Contraseña
+          <span class="input-icon" id="icono-clave">
+            <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+            <input type="password" id="campo-clave" placeholder="••••••••"
+              autocomplete="current-password" aria-label="Contraseña">
+          </span>
+        </label>
+        <span class="field-error oculto" id="error-login" role="alert"></span>
+        <button class="btn btn-gold btn-block" type="submit">
+          Ingresar al panel
+          <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
+        </button>
+        <small>Acceso exclusivo para administradores</small>
+      </form>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       VISTA: PANEL DE ADMINISTRACIÓN (Barberos · Horarios · Citas)
+       ==================================================================== -->
+  <div id="vista-panel" class="admin-layout">
+    <aside class="sidebar">
+      <div class="logo logo-light">
+        <span class="logo-mark">
+          <span class="logo-snip">
+            <svg aria-hidden="true" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="7" r="3"></circle><circle cx="6" cy="17" r="3"></circle><path d="m8.7 8.3 12.3 6.2M8.7 15.7 21 9.5"></path></svg>
+          </span>
+        </span>
+        <span>
+          <b>TAUROS</b>
+          <small>BARBERÍA</small>
+        </span>
+      </div>
+
+      <div class="sidebar-label">ADMINISTRACIÓN</div>
+
+      <nav aria-label="Secciones del panel">
+        <span class="sidebar-indicador" aria-hidden="true"></span>
+        <button type="button" data-tab="barberos" class="active">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          Barberos
+        </button>
+        <button type="button" data-tab="hours">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+          Horarios
+        </button>
+        <button type="button" data-tab="citas">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 10h18"></path></svg>
+          Citas
+        </button>
+      </nav>
+
+      <div class="sidebar-user">
+        <div>AR</div>
+        <span>
+          <b>Administrador</b>
+          <small>admin@tauros.co</small>
+        </span>
+        <button type="button" id="btn-salir" aria-label="Cerrar sesión">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17l5-5-5-5M15 12H3"></path><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path></svg>
+        </button>
+      </div>
+    </aside>
+
+    <main class="admin-main">
+      <header>
+        <div>
+          <span class="eyebrow">PANEL DE CONTROL</span>
+          <h1 id="titulo-tab">Barberos</h1>
+        </div>
+        <div class="today">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 10h18"></path></svg>
+          <span>
+            <small>HOY</small>
+            <b id="hoy-fecha">—</b>
+          </span>
+        </div>
+      </header>
+
+      <!-- Contenido de la pestaña activa (lo pinta js/admin.js) -->
+      <div id="panel-contenido"></div>
+    </main>
+  </div>
+
+  <!-- Contenedor del modal de barbero (lo pinta js/admin.js) -->
+  <div id="modal-admin"></div>
+
+  <noscript>
+    <p style="text-align:center;font-family:sans-serif;padding:40px">
+      Esta aplicación necesita JavaScript para funcionar.
+    </p>
+  </noscript>
+
+  <!-- Configuración generada por build.js (SUPABASE_URL, clave y ADMIN_PASSWORD) -->
+  <script src="../js/config.js"></script>
+  <!-- Supabase vía CDN (capa de datos) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Lógica del panel (módulo ES6) -->
+  <script type="module" src="../js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,705 @@
+/* =============================================================================
+   admin.css — Panel de administración (/admin)
+   Login de dos paneles, layout con sidebar (barra lateral / navegación inferior
+   en móvil), tablas de barberos, horarios y citas, filtros y modal de barbero.
+   Depende de styles.css (variables, botones, estados, modales) y animations.css.
+   ========================================================================== */
+
+/* --- Login (dos paneles) -------------------------------------------------- */
+/* La vista inicial se decide en <head> para evitar parpadeos */
+html[data-sesion="si"] #vista-login {
+  display: none;
+}
+html[data-sesion="no"] #vista-panel {
+  display: none;
+}
+.login-page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 45% 55%;
+  background: white;
+}
+.login-brand {
+  padding: 48px max(48px, 7vw);
+  background:
+    linear-gradient(145deg, rgba(26, 26, 46, 0.96), rgba(17, 17, 29, 0.96)),
+    url("https://images.unsplash.com/photo-1582771498000-8ad44e6c84db?auto=format&fit=crop&w=1000&q=80")
+      center/cover;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.login-brand > div span {
+  color: var(--gold);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+}
+.login-brand h1 {
+  font-size: clamp(42px, 5vw, 66px);
+  line-height: 1.05;
+  margin: 12px 0 19px;
+}
+.login-brand p {
+  color: #b4b4bd;
+  max-width: 420px;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.login-brand > small {
+  color: #6d6d78;
+  font-size: 8px;
+  letter-spacing: 0.15em;
+}
+.login-side {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 40px;
+}
+.back-link {
+  position: absolute;
+  top: 35px;
+  right: 42px;
+  color: #777;
+  font-size: 11px;
+  background: none;
+  border: none;
+  font-family: inherit;
+  text-decoration: none;
+}
+.back-link:hover {
+  color: var(--gold-dark);
+}
+.login-card {
+  width: min(390px, 100%);
+  text-align: center;
+}
+.lock-icon {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  margin: auto;
+  color: var(--gold);
+  border: 1px solid #ead9b4;
+  border-radius: 12px;
+  background: #fcf8ef;
+}
+.login-card h2 {
+  font-size: 29px;
+  margin: 19px 0 3px;
+}
+.login-card > p {
+  color: var(--muted);
+  font-size: 12px;
+  margin-bottom: 29px;
+}
+.login-card label {
+  display: block;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+}
+.input-icon {
+  height: 48px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  padding: 0 13px;
+  color: #aaa;
+}
+.input-icon:focus-within {
+  border-color: var(--gold);
+}
+.input-icon input {
+  flex: 1;
+  height: 100%;
+  padding-left: 10px;
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--ink);
+  background: transparent;
+}
+.input-icon.input-error {
+  border-color: #c85c50;
+}
+.login-card .btn {
+  margin-top: 18px;
+}
+.login-card > small {
+  display: block;
+  color: #aaa;
+  font-size: 9px;
+  margin-top: 18px;
+}
+
+/* --- Layout del panel ----------------------------------------------------- */
+.admin-layout {
+  min-height: 100vh;
+  background: #f5f5f3;
+  padding-left: 235px;
+}
+.sidebar {
+  width: 235px;
+  background: #17172a;
+  color: white;
+  position: fixed;
+  inset: 0 auto 0 0;
+  padding: 27px 19px 19px;
+  display: flex;
+  flex-direction: column;
+  z-index: 20;
+}
+.sidebar .logo {
+  margin-left: 7px;
+}
+.sidebar-label {
+  margin: 42px 10px 11px;
+  color: #626270;
+  font-size: 8px;
+  letter-spacing: 0.18em;
+  font-weight: 700;
+}
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  position: relative;
+}
+.sidebar nav button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  color: #9898a3;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  background: transparent;
+  border: none;
+  font-family: inherit;
+}
+.sidebar nav button:hover,
+.sidebar nav button.active {
+  color: white;
+  background: #27273b;
+}
+/* Indicador dorado deslizante entre las opciones del sidebar */
+.sidebar-indicador {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: var(--ind-h, 42px);
+  background: var(--gold);
+  border-radius: 3px;
+  transform: translateY(var(--ind-y, 0));
+  transition: transform var(--dur-base) var(--ease),
+    height var(--dur-base) var(--ease), width var(--dur-base) var(--ease),
+    opacity var(--dur-base) var(--ease);
+  pointer-events: none;
+}
+.sidebar-user {
+  border-top: 1px solid #2e2e40;
+  padding-top: 18px;
+  margin-top: auto;
+  display: flex;
+  gap: 9px;
+  align-items: center;
+}
+.sidebar-user > div {
+  width: 32px;
+  height: 32px;
+  background: var(--gold);
+  color: var(--ink);
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+  font-weight: 700;
+}
+.sidebar-user span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.sidebar-user b {
+  font-size: 10px;
+}
+.sidebar-user small {
+  color: #70707d;
+  font-size: 8px;
+  margin-top: 2px;
+}
+.sidebar-user button {
+  margin-left: auto;
+  color: #6e6e79;
+  background: none;
+  border: none;
+  padding: 4px;
+  display: grid;
+  place-items: center;
+}
+.sidebar-user button:hover {
+  color: var(--gold);
+}
+.admin-main {
+  min-height: 100vh;
+}
+.admin-main > header {
+  height: 96px;
+  background: white;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 42px;
+}
+.admin-main header .eyebrow {
+  margin-bottom: 2px;
+}
+.admin-main header h1 {
+  font-size: 25px;
+  margin: 0;
+}
+.today {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--gold-dark);
+}
+.today span {
+  display: flex;
+  flex-direction: column;
+}
+.today small {
+  font-size: 8px;
+  color: #999;
+}
+.today b {
+  font-size: 10px;
+  color: var(--ink);
+}
+
+/* --- Secciones del panel -------------------------------------------------- */
+.admin-section {
+  padding: 33px 42px;
+}
+.admin-section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  margin-bottom: 22px;
+}
+.admin-section-head h2 {
+  font-size: 20px;
+  margin: 0 0 4px;
+}
+.admin-section-head p {
+  color: var(--muted);
+  font-size: 11px;
+}
+.table-card {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(25, 25, 40, 0.03);
+}
+.table-scroll {
+  overflow-x: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 790px;
+}
+th {
+  text-align: left;
+  padding: 13px 16px;
+  background: #fafaf9;
+  border-bottom: 1px solid var(--line);
+  font-size: 8px;
+  color: #888892;
+  letter-spacing: 0.1em;
+}
+td {
+  padding: 15px 16px;
+  border-bottom: 1px solid #eee;
+  color: #666672;
+  font-size: 10px;
+}
+tbody tr:last-child td {
+  border-bottom: none;
+}
+td b {
+  color: var(--ink);
+}
+.person-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.person-cell img,
+.person-cell .avatar-iniciales {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: none;
+}
+.person-cell .avatar-iniciales {
+  font-size: 11px;
+}
+.toggle {
+  width: 38px;
+  height: 21px;
+  background: #c9c9cd;
+  border-radius: 20px;
+  padding: 3px;
+  border: none;
+}
+.toggle span {
+  display: block;
+  width: 15px;
+  height: 15px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px #888;
+  transition: transform var(--dur-base) var(--bounce);
+}
+.toggle.on {
+  background: var(--green);
+}
+.toggle.on span {
+  transform: translateX(17px);
+}
+.edit-btn {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 7px 9px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #666;
+  background: white;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 600;
+}
+.edit-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold-dark);
+}
+.admin-note {
+  display: flex;
+  gap: 12px;
+  margin-top: 17px;
+  background: #f0f0ed;
+  padding: 14px;
+  border-radius: 9px;
+}
+.admin-note > span {
+  width: 29px;
+  height: 29px;
+  border-radius: 7px;
+  background: white;
+  display: grid;
+  place-items: center;
+  color: var(--green);
+  flex: none;
+}
+.admin-note b {
+  font-size: 10px;
+}
+.admin-note p {
+  font-size: 9px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.select-wrap {
+  font-size: 9px;
+  color: #777;
+}
+.select-wrap select {
+  display: block;
+  margin-top: 5px;
+  border: 1px solid var(--line);
+  background: white;
+  border-radius: 7px;
+  min-width: 190px;
+  height: 38px;
+  padding: 0 10px;
+  color: var(--ink);
+  font-size: 10px;
+  font-family: inherit;
+}
+.schedule-card td input,
+.schedule-card td select {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  height: 34px;
+  padding: 0 9px;
+  background: white;
+  color: var(--ink);
+  font-size: 10px;
+  font-family: inherit;
+}
+.schedule-card td input:disabled,
+.schedule-card td select:disabled {
+  background: #f4f4f3;
+  color: #aaa;
+}
+.disabled-row {
+  opacity: 0.45;
+  background: #fafafa;
+}
+.save-row {
+  border-top: 1px solid var(--line);
+  background: #fafaf9;
+  padding: 13px 17px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #888;
+  font-size: 9px;
+  gap: 12px;
+}
+.save-row .aviso-error {
+  color: #b54a3e;
+  font-weight: 600;
+}
+
+/* --- Filtros y citas ------------------------------------------------------ */
+.filters {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  gap: 13px;
+  align-items: end;
+  margin-bottom: 15px;
+}
+.filters label {
+  color: #777;
+  font-size: 9px;
+}
+.filters input,
+.filters select {
+  display: block;
+  height: 37px;
+  min-width: 180px;
+  margin-top: 5px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 0 10px;
+  color: var(--ink);
+  font-size: 10px;
+  font-family: inherit;
+  background: white;
+}
+.pill {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 6px 9px;
+  border-radius: 99px;
+  border: none;
+  font-family: inherit;
+}
+.pill.confirmada {
+  color: var(--green);
+  background: #e8f5ee;
+}
+.pill.cancelada {
+  color: #a94b44;
+  background: #fcebea;
+}
+.pill.completada {
+  color: #4a5a8f;
+  background: #eaedf8;
+}
+/* Select en línea para cambiar el estado de una cita */
+.estado-select {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 24 24' fill='none' stroke='%2372727f' stroke-width='3' stroke-linecap='round'><path d='m6 9 6 6 6-6'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 9px center;
+  padding-right: 22px;
+}
+.estado-select.confirmada {
+  color: var(--green);
+  background-color: #e8f5ee;
+}
+.estado-select.cancelada {
+  color: #a94b44;
+  background-color: #fcebea;
+}
+.estado-select.completada {
+  color: #4a5a8f;
+  background-color: #eaedf8;
+}
+.table-footer {
+  padding: 12px 16px;
+  background: #fafaf9;
+  border-top: 1px solid var(--line);
+  color: #888;
+  font-size: 9px;
+}
+.mini-empty {
+  padding: 50px;
+  text-align: center;
+  color: #888;
+  font-size: 11px;
+}
+.hora-celda small {
+  display: block;
+  color: #999;
+  font-size: 9px;
+  margin-top: 2px;
+}
+
+/* --- Modal "Agregar / Editar barbero" ------------------------------------- */
+.small-modal {
+  padding-bottom: 0;
+}
+.small-modal > label {
+  margin-inline: 28px;
+}
+.small-modal .modal-actions {
+  margin-top: 25px;
+}
+.campo-nueva-silla {
+  margin-top: 8px;
+}
+
+/* --- Responsive (breakpoint 800px): navegación inferior -------------------- */
+@media (max-width: 800px) {
+  .login-page {
+    grid-template-columns: 1fr;
+  }
+  .login-brand {
+    display: none;
+  }
+  .login-side {
+    min-height: 100vh;
+    padding: 32px 22px;
+  }
+  .back-link {
+    top: 25px;
+    left: 22px;
+    right: auto;
+  }
+  .login-card h2 {
+    font-size: 27px;
+  }
+
+  .admin-layout {
+    padding: 0 0 72px;
+  }
+  /* El sidebar se convierte en barra de navegación inferior */
+  .sidebar {
+    width: 100%;
+    height: 68px;
+    inset: auto 0 0;
+    padding: 7px 14px;
+    flex-direction: row;
+    align-items: center;
+    box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.15);
+  }
+  .sidebar > .logo,
+  .sidebar-label,
+  .sidebar-user {
+    display: none;
+  }
+  .sidebar nav {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-around;
+  }
+  .sidebar nav button {
+    flex: 1;
+    flex-direction: column;
+    gap: 2px;
+    padding: 7px;
+    font-size: 9px;
+    justify-content: center;
+  }
+  .sidebar nav button svg {
+    width: 18px;
+    height: 18px;
+  }
+  .sidebar-indicador {
+    top: auto;
+    bottom: 0;
+    width: var(--ind-w, 33%);
+    height: 2px;
+    border-radius: 2px 2px 0 0;
+    transform: translateX(var(--ind-x, 0));
+  }
+  .admin-main > header {
+    height: 79px;
+    padding: 0 18px;
+  }
+  .admin-main header h1 {
+    font-size: 22px;
+  }
+  .admin-section {
+    padding: 24px 16px;
+  }
+  .admin-section-head {
+    align-items: flex-start;
+    gap: 15px;
+  }
+  .admin-section-head .btn {
+    min-width: 44px;
+    font-size: 0;
+    padding: 0;
+  }
+  .admin-section-head .btn svg {
+    width: 19px;
+    height: 19px;
+  }
+  .table-card {
+    margin-right: -16px;
+    border-radius: 10px 0 0 10px;
+  }
+  .admin-note {
+    margin-right: 0;
+  }
+  .select-wrap select {
+    min-width: 150px;
+  }
+  .filters {
+    flex-wrap: wrap;
+  }
+  .filters label {
+    flex: 1;
+  }
+  .filters input,
+  .filters select {
+    min-width: 135px;
+    width: 100%;
+  }
+  .filters .btn {
+    width: 100%;
+  }
+  .save-row {
+    position: sticky;
+    left: 0;
+  }
+  .save-row span {
+    display: none;
+  }
+  .small-modal > label {
+    margin-inline: 18px;
+  }
+}
